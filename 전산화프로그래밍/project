@@ -1,1 +1,197 @@
+import random
+import time
+import tkinter as tk
+
+class Pokemon: #포켓몬 클래스 정의
+    def __init__(self, name, attribute, attack, hp):
+        #생성자 메서드, 객체 생성시 호출되며, 클래스의 속성을 초기화합니다, self는 클래스의 인스턴스입니다
+        self.name = name 
+        self.attribute = attribute
+        self.attack = attack
+        self.hp = hp
+
+pokemon1 = Pokemon("파이리", "불", 200, 500)
+pokemon2 = Pokemon("이상해씨", "풀",130, 700)
+pokemon3 = Pokemon("꼬부기", "물", 100, 1000)
+pokemon4 = Pokemon("치코리타", "풀", 150, 750)
+pokemon5 = Pokemon("불꽃숭이", "불", 170, 600)
+ 
+
+pokemon_data = [
+    {"이름": "파이리", "속성": "불", "공격력": 200, "HP": 500},
+    {"이름": "이상해씨", "속성": "풀", "공격력": 130, "HP": 700},
+    {"이름": "꼬부기", "속성": "물", "공격력": 100, "HP": 1000},
+    {"이름": "치코리타", "속성": "풀", "공격력": 150, "HP": 750},
+    {"이름": "불꽃숭이", "속성": "불", "공격력": 170, "HP": 600}
+]
+def display_start_screen():
+    print("====================")
+    print("포켓몬스터")
+    print("press enter key to start")
+    input()
+    
+
+def choose_pokemon(pokemon_data=pokemon_data):
+    print("어느 포켓몬을 고르시겠습니까?")
+    for idx, pokemon_info in enumerate(pokemon_data, start=1):
+        print(f"{idx}. {pokemon_info['이름']} - 속성: {pokemon_info['속성']}, 공격력: {pokemon_info['공격력']}, HP: {pokemon_info['HP']}")
+    choice = int(input("선택 번호: ")) - 1
+    selected_pokemon_data = pokemon_data[choice]
+    return Pokemon(selected_pokemon_data["이름"], selected_pokemon_data["속성"], selected_pokemon_data["공격력"], selected_pokemon_data["HP"])
+
+def shop(player_money=10000, potions=1): #상점 이용  디폴트인수로 기본금액 만원, 기본포션 1개
+    print("상점에 오신 것을 환영합니다!")
+    print("현재 소유 금액: ",player_money)
+    potion_price = 5000
+    print("1. 회복 물약 가격:",potion_price)
+    choice = input("무엇을 선택하시겠습니까? (구매하기 1 나가기 2) ")
+    if choice == "1" and player_money >= potion_price : #구매하기를 누르고 포션보다 보유하는 돈이 더 많다면 조건 걸기
+        player_money -= potion_price #포션금액만큼 차감하기
+        potions += 1
+        print("회복 물약을 구매하였습니다.","남은금액 :", player_money)
+        return player_money, potions
+    elif choice == "2":
+        print("상점을 나갑니다.")
+        return player_money, potions
+    else:
+        print("잘못된 입력이거나 돈이 부족합니다.")
+        return player_money, potions
+
+def delayed_print(text):
+    time.sleep(2)
+    print(text)
+
+def battle(player_pokemon, enemy_pokemon,potions):
+    delayed_print("플레이어 포켓몬: " + player_pokemon.name + " HP: " + str(player_pokemon.hp))
+    delayed_print("적 포켓몬: " + enemy_pokemon.name + " HP: " + str(enemy_pokemon.hp))
+    input("엔터를 눌러 전투를 시작하세요...")
+
+    while enemy_pokemon.hp > 0 and player_pokemon.hp > 0:
+        player_attack = player_pokemon.attack * random.randint(1, 5)
+        enemy_pokemon.hp -= player_attack
+        if player_attack >= 500:
+            delayed_print("효과는 굉장했다.")
+        else:
+            delayed_print("효과가 별로인 듯 하다.")
+        delayed_print(player_pokemon.name + " 포켓몬이 적 포켓몬을 공격하여 " + str(player_attack) + " 의 데미지를 입혔습니다.")
+        delayed_print("적 포켓몬의 남은 HP: " + str(enemy_pokemon.hp))
+
+        if enemy_pokemon.hp <= 0:
+            delayed_print("포켓몬을 쓰러트렸다!")
+            return True
+
+        enemy_attack = enemy_pokemon.attack * random.randint(1, 5)
+        player_pokemon.hp -= enemy_attack
+        if enemy_attack >= 500:
+            delayed_print("적 포켓몬의 공격 효과는 굉장했다.")
+        else:
+            delayed_print("적 포켓몬의 공격 효과가 별로인 듯 하다.")
+        delayed_print(enemy_pokemon.name + " 포켓몬이 플레이어 포켓몬을 공격하여 " + str(enemy_attack) + " 의 데미지를 입혔습니다.")
+        delayed_print("플레이어 포켓몬의 남은 HP: " + str(player_pokemon.hp))
+
+        if player_pokemon.hp <= 0:
+            delayed_print("포켓몬이 쓰러졌다!")
+            return False
+
+    return False
+
+def main():
+    display_start_screen()
+    player_money = 10000
+    player_pokemon = choose_pokemon()
+    potions = 1
+    win_count = 0
+
+    while True:
+        print("====================")
+        print("여행을 떠나시겠습니까?")
+        print("1. 네   2. 상점 가기")
+        choice = input("선택 번호: ")
+
+        if choice == "1":
+            print("길을 걷는 중 ... ... ...")
+            input("Enter를 눌러 계속 진행하세요...")
+            enemy_pokemon_data = random.choice(pokemon_data)
+            enemy_pokemon = Pokemon(enemy_pokemon_data["이름"], enemy_pokemon_data["속성"], enemy_pokemon_data["공격력"], enemy_pokemon_data["HP"])
+            print("야생의 포켓몬이 나타났다!")
+            print("1. 공격   2. 도망치기")
+            battle_choice = input("선택 번호: ")
+            if battle_choice == "1":
+                battle_result = battle(player_pokemon, enemy_pokemon,potions)
+                if battle_result:
+                    win_count += 1
+                    print("전투에서 승리하였습니다!")
+                    if win_count == 5:
+                        print("====================포켓몬 마스터 등극====================")
+                        break
+                else:
+                    delayed_print("당신의 포켓몬이 쓰러졌습니다!")
+                    delayed_print("1. 회복 물약 사용   2. 도망가기")
+                    battle_choice = input("선택 번호: ")
+                    if battle_choice == "1":
+                        if potions > 0:
+                            potions -= 1  # 물약 개수 감소
+                            recovered_hp = random.randint(500, 1000)
+                            player_pokemon.hp += recovered_hp
+                            delayed_print(f"회복 물약을 사용하여 포켓몬의 체력이 {recovered_hp} 만큼 회복되었습니다. 현재 HP: {player_pokemon.hp}")
+                        else:
+                            delayed_print("보유한 물약이 없습니다. 사용할 수 없습니다.")
+                        
+                    elif battle_choice == "2":
+                        print("도망칩니다...")
+                        continue
+                    else:
+                        print("잘못된 입력입니다.")
+                        
+            elif battle_choice == "2":
+                print("다시 처음으로 이동합니다")
+                continue
+            else:
+                print("잘못된 입력입니다")
+        elif choice == "2":
+            player_money, potions = shop(player_money, potions)
+        else:
+            print("잘못된 입력입니다.")
+#로그인 함수 - 티킨터로 활용
+def login():
+    users = {
+        "202210201": "1234"
+    }
+
+    def check_login():
+        username = username_entry.get()
+        password = password_entry.get()
+
+        if username in users and users[username] == password:
+            print("======로그인 성공!======")
+            root.destroy()  
+            main()  
+        else:
+            print("로그인 실패")
+
+    root = tk.Tk()
+    root.title("로그인")
+
+    frame = tk.Frame(root)
+    frame.pack(padx=20, pady=20)
+
+    username_label = tk.Label(frame, text="아이디: ")
+    username_label.grid(row=0, column=0)
+
+    username_entry = tk.Entry(frame)
+    username_entry.grid(row=0, column=1)
+
+    password_label = tk.Label(frame, text="비밀번호: ")
+    password_label.grid(row=1, column=0)
+
+    password_entry = tk.Entry(frame, show="*")
+    password_entry.grid(row=1, column=1)
+
+    login_button = tk.Button(frame, text="로그인", command=check_login)
+    login_button.grid(row=2, columnspan=2)
+
+    root.mainloop()  
+
+login()  
+
 
