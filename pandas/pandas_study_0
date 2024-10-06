@@ -1,0 +1,123 @@
+[pandas] 
+import pandas as pd
+
+[series]
+nums = [i for i in range(1,11)]
+nums
+
+seriesNums = pd.Series(nums)
+seriesNums #호출은 Series *대문자로 
+
+users = [
+    ['철수',180,5],
+    ['짱구',130,5],
+    ['훈이',170,5]
+]
+users
+
+dfUsers = pd.DataFrame(users)
+dfUsers
+
+dfUsers.columns = ['name','height','age']
+dfUsers
+
+>>
+name	height	age
+0	철수	180	5
+1	짱구	130	5
+2	훈이	170	5
+
+/* 리스트 값 저장 -> 데이터 프레임 -> 컬럼 정의 및 표현 */
+
+[데이터 불러오기]
+sample = pd.read_csv("./서울시 책방(서점) 현황정보.csv", encoding='cp949')
+# sample = pd.read_csv("./서울시 책방(서점) 현황정보.csv", encoding='cp949',index_col = 0)
+# sample = sample.set_index("주소")
+# sample.index
+sample.head(5)
+
+[데이터 read]
+- 컬럼명 괄호 안 문자 기준으로 나누기 
+sample = pd.read_csv("./서울시 책방(서점) 현황정보.csv", encoding='cp949')
+Newcols = []
+cols = sample.columns
+
+for col in cols:
+    Newcols.append(col.split("(")[0])
+Newcols   
+ sample.columns = Newcols 
+
+- loc[행 인덱스, 컬럼명] 조회
+sample = pd.read_csv("./서울시 책방(서점) 현황정보.csv", encoding='cp949')
+sample = sample.set_index("연번")
+#sample.loc[2284:2285
+sample.loc[:,"책방 이름"]
+
+- iloc[행인덱스 번호] 조회
+sample = pd.read_csv("./서울시 책방(서점) 현황정보.csv", encoding='cp949')
+sample = sample.set_index("연번")
+sample.iloc[0] #인덱스를활용한다
+sample[sample["구 코드"] >= 300]
+
+[데이터프레임 수정]
+sample.iloc[0,1]=100
+sample
+0번째 행에서 1번째 열 값을 100으로 수정
+
+[컬럼 삭제]
+sample.drop(["홈페이지 url","SNS url"], axis = 1) #axis=0 -> 위아래 행축을 검색함  
+sample.drop(2284,axis=0)
+
+[데이터 연산]
+import pandas as pd
+from pandas import DataFrame
+
+df = DataFrame({
+    "가로": [10, 20, 30, 10, 20, 30, 11],
+    "세로": [20, 23, 22, 33, 22, 12, 11],
+    "높이": [50, 40, 20, 50, 20, 30, 40]
+})
+
+df
+df.sum(axis=0) #세로로 다 더함 
+#df.sum(axis=1) #가로로 다 더함
+
+df.divide(2)
+df.cumprod(axis=0) #누적해서 곱하기
+df.cummax() #누적최댓값 최댓값에서 더이상 누적해서 더하지 않음
+
+- Apply
+def Vol(row):
+    return row["가로"] * row["세로"] * row["높이"]
+
+df["부피"] =df.apply(Vol, axis=1)
+df
+
+- concat
+df2 = DataFrame({
+    "가로": [10, 20, 30, 10, 20, 30, 11],
+    "세로": [20, 23, 22, 33, 22, 12, 11],
+    "높이": [50, 40, 20, 50, 20, 30, 40]
+})
+>>df2
+
+df = DataFrame({
+    "가로": [10, 20, 30, 10, 20, 30, 11],
+    "세로": [20, 23, 22, 33, 22, 12, 11],
+    "높이": [50, 40, 20, 50, 20, 30, 40]
+})
+def Vol(row):
+    return row["가로"] * row["세로"] * row["높이"]
+
+df["부피"] =df.apply(Vol, axis=1)
+df1 = df.copy()
+>>df1
+
+pd.concat([df1, df2])
+
+[중복]
+[결측치]
+
+[시각화]
+plt.rc('font',family='AppleGothic') #글꼴 문제 해결
+import matplotlib.pyplot as plt
