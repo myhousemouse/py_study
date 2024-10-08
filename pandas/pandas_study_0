@@ -2,6 +2,14 @@
 import pandas as pd
 
 [series]
+**
+한 컬럼만 뜯어오면 시리즈
+score_df['학번']
+두 컬럼을 뜯고싶으면 리스트로 불러오기 (슬라이싱) == 두 컬럼이있는 데이터프레임이 됨
+score_df[['학번'],['이름']]
+컬럼을 뜯고 싶으면 컬럼 슬라이싱으로 
+행을 뜯고 싶으면 loc 사용하면 됨
+
 nums = [i for i in range(1,11)]
 nums
 
